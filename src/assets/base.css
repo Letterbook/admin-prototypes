@@ -1,0 +1,129 @@
+:root {
+  --font-sm2: 0.75rem;
+  --font-sm2: 0.875rem;
+  --font-md: 1rem;
+
+  --font-sans:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+
+  --space-sm3: 0.25rem;
+  --space-sm2: 0.5rem;
+  --space-sm1: 0.75rem;
+  --space-md: 1rem;
+  --space-lg1: 2rem;
+  --space-lg2: 3rem;
+
+  --gry-025: #0e0e0e;
+  --gry-050: #121212;
+  --gry-100: #191919;
+  --gry-150: #242424;
+  --gry-200: #313131;
+  --gry-300: #454545;
+  --gry-400: #5c5c5c;
+  --gry-500: #767676;
+  --gry-600: #919191;
+  --gry-700: #aaaaaa;
+  --gry-800: #bfbfbf;
+  --gry-850: #d3d3d3;
+  --gry-900: #e2e2e2;
+  --gry-950: #efefef;
+  --gry-975: #f9f9f9;
+
+  --blu-025: #090f15;
+  --blu-050: #061320;
+  --blu-100: #051b2f;
+  --blu-150: #032641;
+  --blu-200: #033557;
+  --blu-300: #144973;
+  --blu-400: #296091;
+  --blu-500: #447baf;
+  --blu-600: #6396cb;
+  --blu-700: #81afe3;
+  --blu-800: #9dc4f2;
+  --blu-850: #b9d6fc;
+  --blu-900: #d1e5ff;
+  --blu-950: #e6f0ff;
+  --blu-975: #f6faff;
+
+  --LIGHT: initial;
+  --DARK: ;
+  color-scheme: light;
+
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --LIGHT: ;
+    --DARK: initial;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme-appearance="light"] {
+  --LIGHT: initial;
+  --DARK: ;
+  color-scheme: light;
+}
+:root[data-theme-appearance="dark"] {
+  --LIGHT: ;
+  --DARK: initial;
+  color-scheme: dark;
+}
+
+:root {
+  --bg-o   : light-dark( var(--gry-950), var(--gry-025) );
+  --bg     : light-dark( var(--gry-900), var(--gry-050) );
+  --bg-i   : light-dark( var(--gry-850), var(--gry-100) );
+  --bg-ii  : light-dark( var(--gry-800), var(--gry-150) );
+  --bg-iii : light-dark( var(--gry-700), var(--gry-200) );
+
+  --fg-iii : light-dark( var(--gry-300), var(--gry-600) );
+  --fg-ii  : light-dark( var(--gry-200), var(--gry-700) );
+  --fg-i   : light-dark( var(--gry-150), var(--gry-800) );
+  --fg     : light-dark( var(--gry-100), var(--gry-900) );
+  --fg-o   : light-dark( var(--gry-050), var(--gry-950) );
+
+  --fg-link: light-dark( var(--blu-200), var(--blu-800) );
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+  color: var(--fg);
+  background: var(--bg-o);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--fg-link);
+}
