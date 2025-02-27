@@ -60,9 +60,10 @@ async function addNote(e) {
 </script>
 
 <template>
-  <main v-if="report" id="report">
+  <main v-if="report" id="report" class="base-details-screen">
     <div class="report-info">
-      <h1>Report by @{{ reporter.handle }} on {{ time.mediumDate(report.created) }}</h1>
+      <h1 class="info-full-width">
+      Report by @{{ reporter.handle }} on {{ time.mediumDate(report.created) }}</h1>
       <div class="report-meta">
         <div class="report-author">
           <Item label="Reported by">
@@ -129,28 +130,8 @@ async function addNote(e) {
 
     </div> <!-- report-info -->
 
-    <div class="report-activity">
-      <h2>Activity Log</h2>
-      <template v-if="log.length > 0">
-        <template v-for="item of log">
-          <div v-if="item.type == 'note'" class="log-item note">
-            <div class="note-content">{{ item.text }}</div>
-            - @{{item.author}}, {{ time.since(item.created, store.now) }}
-          </div>
-        </template>
-      </template>
-      <div v-else class="dim">
-        no activity yet.
-      </div>
 
-      <form class="add-note" @submit="addNote">
-        <textarea v-model="newNote" :disabled="store.addingNote" />
-        <div>
-          <button class="button" type="submit" :disabled="store.addingNote">Add Note</button>
-          <span v-if="store.addingNote">Saving...</span>
-        </div>
-      </form>
-    </div>
+    <ActivityLog :entity="entity" />
   </main>
   <main v-else>
     Report {{ $route.params.id }} not found.

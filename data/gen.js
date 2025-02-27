@@ -38,9 +38,18 @@ const ageRnd = (maxAge, recency=1) => Math.round(Math.pow(Math.random(), recency
 
 const timeframe = 60 * 24 * 60 * 60
 
-const randMember = (arr) => {
-	const idx = Math.abs(Math.round(Math.random() * arr.length-1))
-	return arr[idx]
+const randMember = (arr, pred = (r)=>r) => {
+	let result
+	let count = 0
+	while (!result || !pred(result) || count < 100) {
+		const idx = Math.abs(Math.round(Math.random() * arr.length-1))
+		result = arr[idx]
+		count++
+	}
+	if (!result) {
+		console.warn('could not satisfy predicate for rand member')
+	}
+	return result
 }
 
 const userProfiles = ['veryOnline', 'infrequent', 'lurker']
@@ -66,7 +75,7 @@ const makeUser = (peerDomain, fieldOverrides={}) => {
 	const profile = randMember(userProfiles)
 	const user = {
 		handle, actor,
-		displayName: faker.internet.displayName(name),
+		displayName: faker.person.fullName(name),
 		bio: faker.person.bio(),
 		age,
 		instance: peerDomain,
@@ -79,8 +88,11 @@ const makeUser = (peerDomain, fieldOverrides={}) => {
 	return user
 }
 
+const thisInstance = universe.thisInstance = faker.internet.domainName()
+
 const makePeerWithUsers = (domain) => {
 	const userCount = posGaussInt(200)
+	if (domain == thisInstance) { userCount = Math.max(userCount, 50) }
 	let age = Math.max(100, ageRnd(timeframe, (Math.random()/10)))
 	if (domain == thisInstance) {
 		age = Math.max(age, timeframe)
@@ -97,7 +109,6 @@ const makePeerWithUsers = (domain) => {
 	}
 }
 
-const thisInstance = universe.thisInstance = faker.internet.domainName()
 const domains = new Set([thisInstance])
 while (domains.size <= 30) {
 	domains.add(faker.internet.domainName())
@@ -281,7 +292,9 @@ const spamComplaints = [
 
 // scenario 1: basic t&s violation, local offender
 ;(function() {
-	let spammer = makeUser(thisInstance, { firstName: 'spammer', age: 60*60*48 })
+	let spammer = makeUser(thisInstance, { 
+		// firstName: 'spammer', 
+		age: 60*60*48 })
 
 	let post1 = makePost(spammer.actor, {
 		content: 'click here for spam pills!',
@@ -308,10 +321,12 @@ const spamComplaints = [
 	})
 })();
 
-// scenario 2: basic t&s violation, remote offender
+// scenario 1.2: basic t&s violation, remote offender
 ; (function() {
 	let srcInstance = randMember(otherInstances)
-	let spammer = makeUser(srcInstance, { firstName: 'spammer', age: 60*60*48 })
+	let spammer = makeUser(srcInstance, { 
+		// firstName: 'spammer', 
+		age: 60*60*48 })
 	const reporters = []
 	for (let i = 0; i<3; i++) {
 		let reporter = randomFrom(ourUsers, reporters)
@@ -334,6 +349,58 @@ const spamComplaints = [
 		makeFollow(spammer, universe.users[user])
 	}
 })()
+
+// scenario 2: a local user is being brigaded (local abusers)
+; (function() {
+	let targetActor = randMember(ourUsers, u => universe.users[u].posts.length > 10)
+	let target = universe.users[targetActor]
+
+	for (let i = 0; i<posGauss(100)+10; i++) {
+		let reporter = makeUser(thisInstance, {
+			// firstName: 'sockpuppet',
+			age: 60*60*48,
+		})
+		for (let i = 0; i < Math.random()*10; i++) {
+			makeFollow(reporter, universe.users[randomFrom(allUsers)])
+		}
+		for (let i = 0; i < Math.random()*10; i++) {
+			makePost(reporter.actor, {
+				content: faker.company.buzzPhrase(),
+			})
+		}
+
+		let reportFocii = []
+		while (reportFocii.length < Math.floor(Math.random()*10)) {
+			const idx = target.posts.length - posGaussInt(target.posts.length)
+			const postId = target.posts[idx]
+			reportFocii.push(universe.posts[postId])
+		}
+		if (reportFocii.length < 1 || coinToss()) {
+			reportFocii.push(target)
+		}
+
+		makeReport({
+			reporter: reporter.actor,
+			summary: randMember(spamComplaints),
+			policies: [coinToss(0.9) && policies.spam].filter(i=>i),
+			targets: reportFocii.filter(i => i)
+		})
+	}
+})();
+
+// scenario: a local user has a crusade against content
+; (function() {
+	let involved = []
+	let reporter = randMember(ourUsers)
+	let targets = []
+	involved.push(reporter)
+	while (involved.length < 20) {
+		let target = randMember(allUsers, involved)
+		targets.push(target)
+		involved.push(target)
+	}
+
+})
 
 console.log('writing main')
 await fs.writeFile(

@@ -10,3 +10,13 @@ const props = defineProps({
 	<slot></slot>
 </div>
 </template>
+
+<style>
+.item {
+  margin-left: var(--space-lg1);
+  strong {
+    margin-left: calc(-1 * var(--space-lg1));
+    margin-right: var(--space-md);
+  }
+}
+</style>

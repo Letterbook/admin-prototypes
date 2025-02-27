@@ -45,6 +45,9 @@ export default reactive({
 		}, 1000)
 	},
 
+	localUser(handle) {
+		return this.data.users[`@${handle}@${this.thisInstance}`]
+	},
 	localUsers() {
 		return this.data.usersAtPeer[this.thisInstance]
 			.map(actor => this.data.users[actor])
@@ -75,7 +78,10 @@ export default reactive({
 
 	post(id) { return this.data.posts[id] },
 
-	reports() { return this.data.reports },
+	reports() { 
+		return Object.values(this.data.reports)
+			.sort((a,b) => a.age - b.age)
+	},
 	report(id) { return this.data.reports[id] },
 
 	reportsForPost(postId, excludesReports = []) {
