@@ -3,7 +3,7 @@ import { reactive } from 'vue'
 
 import rand from '@/util/rand'
 
-import data from '../../data/data.json'
+// import data from '../../data/data.json'
 
 function delay() {
 	return new Promise(resolve => {
@@ -13,6 +13,37 @@ function delay() {
 		)
 	})
 }
+
+const data = await fetch('/src/assets/base.json')
+	.then(r => r.json())
+
+data.usersAtPeer = {}
+
+for (const user of Object.values(data.users)) {
+	if (!data.usersAtPeer[user.instance]) {
+		data.usersAtPeer[user.instance] = []
+	}
+	data.usersAtPeer[user.instance].push(user.actor)
+	if (!user.followedBy) {
+		user.followedBy = []
+	}
+	user.posts = []
+
+	for (const { following, age } of user.following) {
+		const other = data.users[following]
+		if (!other.followedBy) { other.followedBy = [] }
+		other.followedBy.push({
+			actor: user.actor,
+			age
+		})
+	}
+}
+
+for (const [id, post] of Object.entries(data.posts)) {
+	data.users[post.author].posts.push(id)
+}
+
+console.log(data)
 
 const now = Temporal.Now.instant()
 
@@ -25,10 +56,20 @@ for (const post of Object.values(data.posts)) {
 	post.created = now.subtract({ seconds: post.age })
 }
 
+data.reportedSubjects = {}
+
 for (const report of Object.values(data.reports)) {
 	report.created = now.subtract({ seconds: report.age })
 	report.from = data.users[report.reporter]
+	for (const target of report.targets) {
+		const k = `${target.type}:${target.id}`
+		if (!data.reportedSubjects[k]) {
+			data.reportedSubjects[k] = []
+		}
+		data.reportedSubjects[k].push(report.id)
+	}
 }
+
 
 export default reactive({
 	loaded: true,
@@ -84,15 +125,10 @@ export default reactive({
 	},
 	report(id) { return this.data.reports[id] },
 
-	reportsForPost(postId, excludesReports = []) {
-		return this.data.reportedPosts[postId]
-			?.filter(id => !excludesReports.includes(id))
-			.map(id => this.data.reports[id]) || []
-	},
-	reportsForUser(userId, excludesReports = []) {
-		return this.data.reportedUsers[userId]
-			?.filter(id => !excludesReports.includes(id))
-			.map(id => this.data.reports[id]) || []
+	reportsFor(type, id, exclude=[]) {
+		return this.data.reportedSubjects[`${type}:${id}`]
+			?.filter(id => !exclude.includes(id))
+		  .map(id => this.data.reports[id]) || []
 	},
 
 	async addNote(id, text) {

@@ -1,6 +1,6 @@
 <script setup>
 import time from '@/util/time'
-import { useRoute } from 'vue-router'
+import { useRoute, RouterLink } from 'vue-router'
 import { watch, inject } from 'vue'
 
 const store = inject('store')
@@ -27,16 +27,16 @@ function loadReport(id) {
     relatedReports = {}
     log = store.log(entity)
 
-    for (const target of report.targets) {
-      if (target.post) {
-        let post = store.post(target.post)
+    for (const { type, id, ...target} of report.targets) {
+      if (type == "post") {
+        let post = store.post(id)
         reportedPosts.push(post)
         post.authorInfo = postAuthors[post.author] = store.user(post.author)
-        relatedReports[post.id] = store.reportsForPost(post.id, [report.id])
-        relatedReports[post.author] = store.reportsForUser(post.author, [report.id])
-      } else if (target.profile) {
-        reportedProfiles.push(store.user(target.profile))
-        relatedReports[target.profile] = store.reportsForUser(target.profile, [report.id])
+        relatedReports[post.id] = store.reportsFor('post', post.id, [report.id])
+        relatedReports[post.author] = store.reportsFor('user', post.author, [report.id])
+      } else if (type == "user") {
+        reportedProfiles.push(store.user(id))
+        relatedReports[id] = store.reportsForUser(id, [report.id])
       }
     }
     for (const profile of reportedProfiles) {
@@ -68,7 +68,7 @@ async function addNote(e) {
         <div class="report-author">
           <Item label="Reported by">
             {{ reporter.displayName }}
-            (<a :href="`/users/${reporter.handle}`">@{{ reporter.handle }}</a>)
+            (<RouterLink :to="`/users/${reporter.handle}`">@{{ reporter.handle }}</RouterLink>)
           </Item>
           <Item label="Joined">{{ time.since(reporter.created, store.now) }}</Item>
           <Item label="Last Active"> {{ time.since(reporter.lastActive, store.now) }}</Item>
@@ -99,7 +99,7 @@ async function addNote(e) {
           <div v-for="post of reportedPosts" class="reported-post">
             <div class="post-content">{{ post.content }}</div>
             <Item label="Posted">
-              <a :href="`/posts/${post.id}`">{{ time.since(post.created, store.now) }}</a>
+              <RouterLink :to="`/posts/${post.id}`">{{ time.since(post.created, store.now) }}</RouterLink>
             </Item>
             <Item label="Author">
               <span v-if="post.authorInfo.isLocal"><a :href="`/users/${post.authorInfo.handle}`">@{{
@@ -107,7 +107,7 @@ async function addNote(e) {
                 <span class="badge">local</span>
               </span>
               <span v-else>
-                <a :href="`/profiles/${post.authorInfo.actor}`">{{post.authorInfo.actor}}</a>
+                <RouterLink :to="`/profiles/${post.authorInfo.actor}`">{{post.authorInfo.actor}}</RouterLink>
               </span>
             </Item>
             <Item v-if="relatedReports[post.id]?.length > 0" label="Related Reports">

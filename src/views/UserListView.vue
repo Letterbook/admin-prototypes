@@ -1,6 +1,7 @@
 <script setup>
   import time from '@/util/time.js'
 import { inject } from 'vue'
+import { RouterLink } from 'vue-router';
 const store = inject('store')
 </script>
 
@@ -33,7 +34,7 @@ const store = inject('store')
       <tr v-for="user in store.localUsers()">
         <td class="user">
           <div class="handle">
-            <a href="">{{ user.handle }}</a>
+            <RouterLink :to="`/users/${user.handle}`">{{ user.handle }}</RouterLink>
           </div>
         </td>
         <td class="user">
@@ -45,7 +46,7 @@ const store = inject('store')
         <td class="tenure">
           {{ time.since(user.lastActive, store.now)}}
         </td>
-        <td class="following group-start">{{ Object.keys(user.following).length }}</td>
+        <td class="following group-start">{{  user.following.length }}</td>
         <td class="followers">{{ user.followedBy.length }}</td>
         <td class="posts group-start">
           {{ store.userPosts(user.actor).length }}

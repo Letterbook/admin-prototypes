@@ -1,5 +1,6 @@
 <script setup>
 import { inject } from 'vue'
+import { RouterLink } from 'vue-router';
 import time from '@/util/time'
 
 const props = defineProps(['report'])
@@ -10,9 +11,9 @@ const store = inject('store')
 <template>
 <div class="related-report">
 	– 
-	<a :href="`/reports/${props.report.id}`">
+	<RouterLink :to="`/reports/${props.report.id}`">
 		{{ time.since(props.report.created, store.now) }} by
 		@{{ props.report.from.handle }}
-	</a>
+	</RouterLink>
 </div>
 </template>

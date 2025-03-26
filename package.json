@@ -1,5 +1,9 @@
 {
 	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build && cp dist/index.html dist/404.html"
+	},
 	"dependencies": {
 		"@faker-js/faker": "^9.5.0",
 		"js-yaml": "^4.1.0",

@@ -40,7 +40,7 @@ const store = inject('store')
     </thead>
     <tbody>
     <tr v-for="report of store.reports()">
-      <td class="nav"><a :href="`/reports/${report.id}`">→</a></td>
+      <td class="nav"><RouterLink :to="`/reports/${report.id}`">→</RouterLink></td>
       <td class="age">
         {{ time.since(report.created, store.now) }}
       </td>

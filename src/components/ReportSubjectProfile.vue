@@ -1,5 +1,6 @@
 <script setup>
 import { inject } from 'vue'
+import { RouterLink } from 'vue-router';
 import time from '@/util/time'
 
 const props = defineProps(['profile', 'relatedReports'])
@@ -11,7 +12,7 @@ const store = inject('store')
 	<Item label="Display Name">{{ profile.displayName }}</Item>
 	<div v-if="profile.isLocal">
 		<Item label="Handle">
-			<a :href="`/users/${profile.actor}`">{{ profile.handle }}</a>
+			<RouterLink :to="`/users/${profile.actor}`">{{ profile.handle }}</RouterLink>
 			<Badge>Local</Badge>
 		</Item>
 		<Item label="Joined">{{ time.since(profile.created, store.now) }}</Item>
@@ -27,10 +28,10 @@ const store = inject('store')
 	</div>
 	<div v-else>
 		<Item label="Handle">
-			<a :href="`/profiles/${profile.actor}`">{{profile.handle}}</a>
+			<RouterLink :to="`/profiles/${profile.actor}`">{{profile.handle}}</RouterLink>
 		</Item>
 		<Item label="Peer">
-			<a :href="`/instances/${profile.instance}`">{{profile.instance}}</a>
+			<RouterLink :to="`/instances/${profile.instance}`">{{profile.instance}}</RouterLink>
 		</Item>
 		<Item label="First Seen"></Item>
 		<Item label="Last Seen"></Item>
