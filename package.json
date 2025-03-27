@@ -2,7 +2,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build && cp dist/index.html dist/404.html"
+		"build": "vite build"
 	},
 	"packageManager": "pnpm@10.7.x",
 	"engines": {
