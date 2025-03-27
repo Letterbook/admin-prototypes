@@ -4,7 +4,7 @@ import { inject, onMounted } from 'vue'
 
 const store = inject('store')
 
-const prefix = VITE_NODE_ENV == "production" ? "/admin-prototypes" : ""
+const prefix = import.meta.env.MODE == "production" ? "/admin-prototypes" : ""
 
 onMounted(() => {
   store._initialize(prefix)
