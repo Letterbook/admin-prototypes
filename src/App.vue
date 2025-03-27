@@ -4,8 +4,10 @@ import { inject, onMounted } from 'vue'
 
 const store = inject('store')
 
+const prefix = VITE_NODE_ENV == "production" ? "/admin-prototypes" : ""
+
 onMounted(() => {
-  store._initialize()
+  store._initialize(prefix)
   store.startClock()
 })
 </script>
