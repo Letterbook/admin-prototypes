@@ -2,6 +2,8 @@
 name: Github Pages Deploy
 run-name: ${{ github.actor }} is compiling to Pages
 on: [push]
+env:
+  NODE_ENV: production
 jobs:
   build_vue:
     name: Build Vue

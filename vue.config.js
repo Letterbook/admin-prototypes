@@ -1,3 +1,3 @@
 module.exports = {
-    base: '/admin-prototypes/'
+    publicPath: process.env.NODE_ENV === 'production' ? '/admin-prototypes/' : '/'
 }
