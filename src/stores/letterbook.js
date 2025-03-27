@@ -14,71 +14,76 @@ function delay() {
 	})
 }
 
-const data = await fetch('/src/assets/base.json')
-	.then(r => r.json())
+function setupData(data, now) {
+	data.usersAtPeer = {}
 
-data.usersAtPeer = {}
-
-for (const user of Object.values(data.users)) {
-	if (!data.usersAtPeer[user.instance]) {
-		data.usersAtPeer[user.instance] = []
-	}
-	data.usersAtPeer[user.instance].push(user.actor)
-	if (!user.followedBy) {
-		user.followedBy = []
-	}
-	user.posts = []
-
-	for (const { following, age } of user.following) {
-		const other = data.users[following]
-		if (!other.followedBy) { other.followedBy = [] }
-		other.followedBy.push({
-			actor: user.actor,
-			age
-		})
-	}
-}
-
-for (const [id, post] of Object.entries(data.posts)) {
-	data.users[post.author].posts.push(id)
-}
-
-console.log(data)
-
-const now = Temporal.Now.instant()
-
-for (const user of Object.values(data.users)) {
-	user.lastActive = now.subtract({ seconds: user.lastActive })
-	user.created = now.subtract({ seconds: user.age })
-	user.isLocal = user.instance == data.thisInstance
-}
-for (const post of Object.values(data.posts)) {
-	post.created = now.subtract({ seconds: post.age })
-}
-
-data.reportedSubjects = {}
-
-for (const report of Object.values(data.reports)) {
-	report.created = now.subtract({ seconds: report.age })
-	report.from = data.users[report.reporter]
-	for (const target of report.targets) {
-		const k = `${target.type}:${target.id}`
-		if (!data.reportedSubjects[k]) {
-			data.reportedSubjects[k] = []
+	for (const user of Object.values(data.users)) {
+		if (!data.usersAtPeer[user.instance]) {
+			data.usersAtPeer[user.instance] = []
 		}
-		data.reportedSubjects[k].push(report.id)
+		data.usersAtPeer[user.instance].push(user.actor)
+		if (!user.followedBy) {
+			user.followedBy = []
+		}
+		user.posts = []
+
+		for (const { following, age } of user.following) {
+			const other = data.users[following]
+			if (!other.followedBy) { other.followedBy = [] }
+			other.followedBy.push({
+				actor: user.actor,
+				age
+			})
+		}
+	}
+
+	for (const [id, post] of Object.entries(data.posts)) {
+		data.users[post.author].posts.push(id)
+	}
+
+
+	for (const user of Object.values(data.users)) {
+		user.lastActive = now.subtract({ seconds: user.lastActive })
+		user.created = now.subtract({ seconds: user.age })
+		user.isLocal = user.instance == data.thisInstance
+	}
+	for (const post of Object.values(data.posts)) {
+		post.created = now.subtract({ seconds: post.age })
+	}
+
+	data.reportedSubjects = {}
+
+	for (const report of Object.values(data.reports)) {
+		report.created = now.subtract({ seconds: report.age })
+		report.from = data.users[report.reporter]
+		for (const target of report.targets) {
+			const k = `${target.type}:${target.id}`
+			if (!data.reportedSubjects[k]) {
+				data.reportedSubjects[k] = []
+			}
+			data.reportedSubjects[k].push(report.id)
+		}
 	}
 }
 
+const start = Temporal.Now.instant()
 
 export default reactive({
-	loaded: true,
-	data,
-	start: now,
-	now,
-	thisInstance: data.thisInstance,
+	loaded: false,
+	start,
 
+	now: start,
+	thisInstance: '',
+	data: {},
 	log: {},
+
+	async _initialize() {
+		const data = this.data = await fetch('/src/assets/base.json').then(r => r.json())
+		this.thisInstance = data.thisInstance
+		setupData(data, start)
+		this.loaded = true
+		console.log('data loaded', data)
+	},
 
 	startClock() {
 		setInterval(() => {

@@ -6,7 +6,7 @@ const store = inject('store')
 </script>
 
 <template>
-  <main v-if="store.loaded">
+  <main>
     <table class="table">
       <thead>
         <tr class="super">
@@ -60,9 +60,6 @@ const store = inject('store')
       </tr>
       </tbody>
     </table>
-  </main>
-  <main v-else>
-    Loading...
   </main>
 </template>
 

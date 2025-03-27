@@ -5,6 +5,7 @@ import { inject, onMounted } from 'vue'
 const store = inject('store')
 
 onMounted(() => {
+  store._initialize()
   store.startClock()
 })
 </script>
@@ -24,7 +25,8 @@ onMounted(() => {
     </div>
   </header>
 
-  <RouterView />
+  <RouterView v-if="store.loaded" />
+  <div v-else>Loading...</div>
 </template>
 
 <style scoped>
