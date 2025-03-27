@@ -78,7 +78,7 @@ export default reactive({
 	log: {},
 
 	async _initialize(pathPrefix) {
-		const data = this.data = await fetch(`${pathPrefix}/src/assets/base.json`).then(r => r.json())
+		const data = this.data = await fetch(`${pathPrefix}/base.json`).then(r => r.json())
 		this.thisInstance = data.thisInstance
 		setupData(data, start)
 		this.loaded = true
