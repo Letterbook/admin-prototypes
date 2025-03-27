@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: Build-Vue
-        uses: mattly/VuePagesAction@1.0.2
+        uses: mattly/VuePagesAction@1.0.3
         with:
           username: mattly
           reponame: admin-prototypes
