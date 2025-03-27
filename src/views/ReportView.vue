@@ -36,7 +36,7 @@ function loadReport(id) {
         relatedReports[post.author] = store.reportsFor('user', post.author, [report.id])
       } else if (type == "user") {
         reportedProfiles.push(store.user(id))
-        relatedReports[id] = store.reportsForUser(id, [report.id])
+        relatedReports[id] = store.reportsFor('user', id, [report.id])
       }
     }
     for (const profile of reportedProfiles) {
